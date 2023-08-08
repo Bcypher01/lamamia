@@ -3,12 +3,29 @@ import Image from "next/image";
 import Link from "next/link";
 import styles from "./page.module.css";
 
-const BlogPost = () => {
+import { notFound } from "next/navigation";
+
+async function getData(id) {
+  const res = await fetch(`https://jsonplaceholder.typicode.com/posts/${id}`, {
+    // next: { revalidate: 10 },
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    // This will activate the closest `error.js` Error Boundary
+    throw new Error("Failed to fetch data");
+  }
+
+  return res.json();
+}
+
+const BlogPost = async ({ params }) => {
+  const data = await getData(params.id);
   return (
     <div className={styles.container}>
       <div className={styles.top}>
         <div className={styles.info}>
-          <h1 className={styles.title}>Title</h1>
+          <h1 className={styles.title}>{data.title}</h1>
           <p className={styles.desc}>Desc</p>
           <div className={styles.author}>
             <Image
